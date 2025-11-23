@@ -6,7 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
+Route::get('/home', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -15,7 +15,7 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/about', function () {
     return Inertia::render('About');
@@ -49,7 +49,7 @@ Route::get('/gallery', function () {
 
 
 Route::get('/blog', function () {
-    return Inertia::render('Blog/Index');
+    return Inertia::render('BlogPost');
 })->name('blog');
 
 Route::get('/blog/{slug}', function ($slug) {
