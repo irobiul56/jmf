@@ -29,7 +29,7 @@
                 </Link>
               </li>
               <li>
-                <Link :href="route('activities')" class="hover:text-blue-600 transition-colors py-2 px-3 rounded-lg" :class="{ 'text-blue-600 border-b-2 border-blue-600': $page.url === '/activities' }">
+                <Link :href="route('activities')" class="hover:text-blue-600 transition-colors py-2 px-3 rounded-lg" :class="{ 'text-blue-600 border-b-2 border-blue-600': $page.url === '/our-activities' }">
                   Activities
                 </Link>
               </li>

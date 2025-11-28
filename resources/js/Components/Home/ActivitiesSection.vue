@@ -13,7 +13,7 @@
         >
           <!-- Featured Image -->
           <img 
-            :src="activity.image" 
+            :src="`/storage/${activity.image}`"
             :alt="activity.title" 
             class="w-full h-48 object-cover"
             @error="handleImageError"
@@ -21,10 +21,10 @@
           <div class="p-6">
             <!-- Tag -->
             <div class="inline-block px-3 py-1 mb-3 bg-green-100 text-green-700 text-xs font-bold rounded-full tracking-wide">
-              {{ activity.tag }}
+              {{ activity.category.name }}
             </div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">{{ activity.title }}</h3>
-            <p class="text-sm text-gray-500 mb-4">{{ activity.description }}</p>
+            <p v-html="activity.description" class="text-sm text-gray-500 mb-4"></p>
             <Link 
               :href="activity.link || '#'" 
               class="text-green-brand font-semibold hover:text-green-brand-dark transition duration-150 inline-flex items-center"

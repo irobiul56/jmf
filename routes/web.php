@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\ActivitiesController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\HomeController;
+use App\Models\Activity;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -21,8 +24,11 @@ Route::get('/about', function () {
     return Inertia::render('About');
 })->name('about');
 
-Route::get('/activities', function () {
-    return Inertia::render('Activities');
+Route::get('/our-activities', function () {
+    $activities = Activity::with('category')->get();
+    return Inertia::render('Activities',[
+        'activities'  => $activities,  
+    ]);
 })->name('activities');
 
 Route::get('/blog', function () {
@@ -78,6 +84,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
+    Route::resource('activites', ActivitiesController::class);
+    Route::resource('blogpost', BlogController::class);
 });
 
 require __DIR__.'/auth.php';

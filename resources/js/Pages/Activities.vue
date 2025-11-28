@@ -38,51 +38,13 @@ import ActivityCard from '@/Components/ActivityCard.vue'
 // Mobile menu state
 const isMenuOpen = ref(false)
 
-// Activities data
-const activities = ref([
-  {
-    id: 1,
-    category: "Regular Projects",
-    title: "Jagoroni Skill Developme...",
-    description: "An institute for self-development and skill enhancement registered by the National Ski...",
-    image: "storage/images/1.jpeg"
-  },
-  {
-    id: 2,
-    category: "Regular Projects",
-    title: "Disaster Relief and...",
-    description: "During floods, cyclones, and fires—Jagoroni Foundation stands beside helpless people i...",
-    image: "storage/images/3.jpeg"
-  },
-  {
-    id: 3,
-    category: "Regular Projects",
-    title: "Skill-Based Entrepreneursh...",
-    description: "A humanitarian effort to support those who possess skills but lack the capital to start thi...",
-    image: "storage/images/4.jpeg"
-  },
-  {
-    id: 4,
-    category: "Regular Projects",
-    title: "Self-Reliance",
-    description: "Under this program, income-generating tools are provided to capable poor individuals.",
-    image: "storage/images/8.jpeg"
-  },
-  {
-    id: 5,
-    category: "Regular Projects",
-    title: "Meritorious Program",
-    description: "An initiative to build a generation with honesty, competence, and humanitaran...",
-    image: "storage/images/6.jpeg"
-  },
-  {
-    id: 6,
-    category: "Regular Projects",
-    title: "Dawah Activities",
-    description: "Jagoroni Foundation's dawah initiatives aim to inspire Islamic values by spreading...",
-    image: "storage/images/7.jpeg"
+defineProps({
+  activities: {
+    type: Array,
+    required: true,
+    default: () => []
   }
-])
+})
 
 // Mobile menu toggle function
 const toggleMenu = () => {

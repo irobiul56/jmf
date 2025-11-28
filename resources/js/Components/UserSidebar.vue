@@ -39,7 +39,7 @@ const isRouteActive = (patterns) => {
         </li>
 
          <li>
-          <NavLink :href="route('dashboard')" 
+          <NavLink :href="route('activites.index')" :active="isRouteActive(['activites', 'activites.*'])"
             class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
             :class="isCollapsed ? 'justify-center px-2' : 'px-3'">
             <div class="flex items-center">
@@ -61,7 +61,7 @@ const isRouteActive = (patterns) => {
         </li>
 
         <li>
-          <NavLink :href="route('dashboard')"
+          <NavLink :href="route('blogpost.index')" :active="isRouteActive(['blogpost', 'blogpost.*'])"
             class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
             :class="isCollapsed ? 'justify-center px-2' : 'px-3'">
             <div class="flex items-center">

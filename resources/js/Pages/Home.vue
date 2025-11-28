@@ -55,7 +55,7 @@
     <hr class="border-gray-200">
 
     <!-- Blog Section -->
-    <BlogSection :posts="blogPosts" />
+    <BlogSection :blog="blog" />
 
     <hr class="border-gray-200">
 
@@ -84,7 +84,7 @@ import CallToActionSection from '@/Components/Home/CallToActionSection.vue'
 
 defineProps({
   activities: Array,
-  blogPosts: Array,
+  blog: Array,
   galleryImages: Array
 })
 </script>
