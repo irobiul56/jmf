@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\ActivitiesController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NoticeController;
 use App\Models\Activity;
 use App\Http\Controllers\ProfileController;
+use App\Models\Notice;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -36,7 +39,11 @@ Route::get('/blog', function () {
 })->name('blog');
 
 Route::get('/notice', function () {
-    return Inertia::render('Notice');
+    $notice = Notice::with('category')->get();
+    return Inertia::render('Notice',[
+       'notice'  => $notice,   
+    ]);
+
 })->name('notice');
 
 Route::get('/contact', function () {
@@ -88,6 +95,8 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('activites', ActivitiesController::class);
     Route::resource('blogpost', BlogController::class);
+    Route::resource('photos', GalleryController::class);
+    Route::resource('notices', NoticeController::class);
 });
 
 require __DIR__.'/auth.php';

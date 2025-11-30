@@ -50,7 +50,7 @@
     <hr class="border-gray-200">
 
     <!-- Gallery Section -->
-    <GallerySection :images="galleryImages" />
+    <GallerySection :media="media" />
 
     <hr class="border-gray-200">
 
@@ -85,6 +85,6 @@ import CallToActionSection from '@/Components/Home/CallToActionSection.vue'
 defineProps({
   activities: Array,
   blog: Array,
-  galleryImages: Array
+  media: Array
 })
 </script>
