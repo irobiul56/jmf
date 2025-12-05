@@ -13,7 +13,8 @@ const imagePreview = ref(null);
 const props = defineProps({
     slide: Object,
     coreIdentities: Array,
-    features: Array
+    features: Array,
+    donationData:Object
 });
 
 // Initialize slideData with props or default values
@@ -149,7 +150,7 @@ const getImageUrl = (path) => {
             <FeaturesSection :initial-features="features || []" />
 
             <!-- Donation Section -->
-            <DonationSection />
+            <DonationSection :donationData ="donationData" />
 
         </div>
 

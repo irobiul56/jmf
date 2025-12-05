@@ -40,7 +40,7 @@
     <hr class="border-gray-200">
 
     <!-- Features Section -->
-    <FeaturesSection />
+    <FeaturesSection :initial-features="initialFeatures || []" />
 
     <hr class="border-gray-200">
 
@@ -60,7 +60,7 @@
     <hr class="border-gray-200">
 
     <!-- Donation Section -->
-    <DonationSection />
+    <DonationSection :donationData ="donationData" />
 
     <hr class="border-gray-200">
 
@@ -87,6 +87,9 @@ defineProps({
   blog: Array,
   media: Array,
   slide: Object,
-  coreIdentities: Array
+  coreIdentities: Array,
+  initialFeatures:Array,
+  donationData: Object,
+  
 })
 </script>

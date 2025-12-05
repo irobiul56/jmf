@@ -88,9 +88,9 @@
             </Link>
 
             <!-- Donate Button -->
-            <a href="#donate" class="px-3 py-1.5 text-sm font-semibold text-white bg-green-600 rounded-md shadow-lg hover:bg-red-700 transition duration-150 flex-shrink-0">
+            <Link :href="route('home') + '#donate'" class="px-3 py-1.5 text-sm font-semibold text-white bg-green-600 rounded-md shadow-lg hover:bg-red-700 transition duration-150 flex-shrink-0">
               Donation
-            </a>
+            </Link>
 
             <!-- Mobile Menu Button -->
             <button 

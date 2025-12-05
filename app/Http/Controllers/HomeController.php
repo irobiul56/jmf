@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Activity;
 use App\Models\Blog;
 use App\Models\Coreidentity;
+use App\Models\Donation;
 use App\Models\Feature;
 use App\Models\Gallery;
 use App\Models\Slide;
@@ -45,27 +46,32 @@ class HomeController extends Controller
 
          
         $coreIdentities = Coreidentity::all();
-        
+        $initialFeatures = Feature::orderBy('order', 'asc')->get();
+        $donationData = Donation::with('donationMethods')->first();
+
         return Inertia::render('Home', [
             'activities'  => $activities,  
             'blog'  => $blog,  
             'media' => $media,
             'slide' => $slide,
             'coreIdentities' => $coreIdentities,
-            
+            'initialFeatures' => $initialFeatures,
+            'donationData' => $donationData,
             
         ]);
     }
 
 public function homeadmin(){
-    $initialFeatures = Feature::orderBy('order', 'asc')->get();
     $slide = Slide::first();
     $coreIdentities = Coreidentity::all();
+    $initialFeatures = Feature::orderBy('order', 'asc')->get();
+    $donationData = Donation::with('donationMethods')->first();
     
     return Inertia::render('Dashboard/Home/Index', [
         'slide' => $slide,
         'coreIdentities' => $coreIdentities,
-        'features' => $initialFeatures, // Make sure this key matches the prop name
+        'features' => $initialFeatures,
+        'donationData' => $donationData,
     ]);
 }
 

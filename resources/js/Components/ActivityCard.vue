@@ -15,8 +15,8 @@
       <h3 class="text-xl font-semibold text-gray-900 mb-3">
         {{ activity.title }}
       </h3>
-      <p class="text-gray-500 text-base mb-4 line-clamp-3">
-        {{ activity.description }}
+      <p class="text-gray-500 text-base mb-4 line-clamp-3" v-html="activity.description">
+        
       </p>
 
       <a 

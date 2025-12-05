@@ -4,6 +4,8 @@ use App\Http\Controllers\ActivitiesController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CoreIdentityController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\DonationMethodController;
 use App\Http\Controllers\FeatureController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HomeController;
@@ -109,6 +111,29 @@ Route::middleware('auth')->group(function () {
     
     Route::resource('core-identities', CoreIdentityController::class);
     Route::resource('/features', FeatureController::class);
+
+
+     // Donation Resource Routes (Main Section)
+    Route::resource('donations', DonationController::class)->except(['index', 'create', 'store']);
+    
+    // Additional custom routes for donation
+    Route::post('donations/{donation}/image', [DonationController::class, 'updateImage'])
+        ->name('donations.update-image');
+    
+    // Donation Methods Resource Routes (Nested under donation)
+    Route::resource('donations.methods', DonationMethodController::class)
+        ->except(['show'])
+        ->shallow(); 
+
+    Route::patch('/donation/methods/{donationMethod}', [DonationMethodController::class, 'updateMethod'])->name('donations.methods.update');
+    Route::delete('/donation/methods/{donationMethod}', [DonationMethodController::class, 'destroyMethod'])->name('donations.methods.destroy');
+
+    
+    // Bulk actions for donation methods
+    Route::post('donation-methods/bulk-update', [DonationMethodController::class, 'bulkUpdate'])
+        ->name('donation.methods.bulk-update');
+    Route::post('donation-methods/reorder', [DonationMethodController::class, 'reorder'])
+        ->name('donation.methods.reorder');
 
 
 });
