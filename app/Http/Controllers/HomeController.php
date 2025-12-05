@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 use App\Models\Activity;
 use App\Models\Blog;
+use App\Models\Coreidentity;
+use App\Models\Feature;
 use App\Models\Gallery;
+use App\Models\Slide;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -18,6 +22,10 @@ class HomeController extends Controller
             ->latest()
             ->paginate(6); // Adjust pagination as needed
 
+        $slide = Slide::first();
+
+
+
         // Add additional data to each media item
         $media->getCollection()->transform(function ($item) {
             return [
@@ -27,7 +35,7 @@ class HomeController extends Controller
                 'path' => $item->path,
                 'caption' => $item->caption,
                 'url' => Storage::url($item->path),
-                'thumbnail_url' => Storage::url($item->path), // You can create thumbnails later
+                'thumbnail_url' => Storage::url($item->path),
                 'created_at' => $item->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $item->updated_at->format('Y-m-d H:i:s'),
                
@@ -35,11 +43,72 @@ class HomeController extends Controller
             ];
         });
 
+         
+        $coreIdentities = Coreidentity::all();
+        
         return Inertia::render('Home', [
             'activities'  => $activities,  
             'blog'  => $blog,  
             'media' => $media,
+            'slide' => $slide,
+            'coreIdentities' => $coreIdentities,
+            
             
         ]);
     }
+
+public function homeadmin(){
+    $initialFeatures = Feature::orderBy('order', 'asc')->get();
+    $slide = Slide::first();
+    $coreIdentities = Coreidentity::all();
+    
+    return Inertia::render('Dashboard/Home/Index', [
+        'slide' => $slide,
+        'coreIdentities' => $coreIdentities,
+        'features' => $initialFeatures, // Make sure this key matches the prop name
+    ]);
+}
+
+
+ public function update(Request $request)
+{
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string|max:500',
+        'background_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+    ]);
+
+    // Get existing slide or prepare to create new
+    $slide = Slide::first();
+    
+    // Store current image path
+    $currentImage = $slide ? $slide->background_image : null;
+
+    // Process the image if uploaded
+    if ($request->hasFile('background_image')) {
+        // Store new image
+        $path = $request->file('background_image')->store('slides', 'public');
+        $validated['background_image'] = $path;
+        
+        // Delete old image if exists
+        if ($currentImage && Storage::disk('public')->exists($currentImage)) {
+            Storage::disk('public')->delete($currentImage);
+        }
+    } else {
+        // If no new image, keep the existing one
+        $validated['background_image'] = $currentImage;
+    }
+
+    // Use updateOrCreate to handle both cases
+    $slide = Slide::updateOrCreate(
+        ['id' => $slide ? $slide->id : 0], // Condition
+        $validated // Data to update/create
+    );
+
+    return redirect()->back()->with([
+        'success' => 'Slide updated successfully!',
+        'slide' => $slide
+    ]);
+}
+
 }

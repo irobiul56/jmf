@@ -26,7 +26,8 @@ const defaultConfig = {
             [{ 'align': [] }],
             ['blockquote', 'code-block'],
             ['link', 'image', 'video'],
-            ['clean']
+            ['clean'],
+            
         ]
     },
     placeholder: 'Compose an epic...',

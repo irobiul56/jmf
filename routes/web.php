@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ActivitiesController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CoreIdentityController;
+use App\Http\Controllers\FeatureController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NoticeController;
@@ -82,6 +85,7 @@ Route::get('/contact', function () {
     return Inertia::render('Contact');
 })->name('contact');
 
+Route::post('/contact', [ContactController::class, 'contactsubmit'])->name('contact.submit');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -97,6 +101,16 @@ Route::middleware('auth')->group(function () {
     Route::resource('blogpost', BlogController::class);
     Route::resource('photos', GalleryController::class);
     Route::resource('notices', NoticeController::class);
+    Route::resource('contactlist', ContactController::class);
+
+    Route::get('/admin/home', [HomeController::class, 'homeadmin'])->name('home.admin');
+
+    Route::post('/slide/update', [HomeController::class, 'update'])->name('slide.update');
+    
+    Route::resource('core-identities', CoreIdentityController::class);
+    Route::resource('/features', FeatureController::class);
+
+
 });
 
 require __DIR__.'/auth.php';

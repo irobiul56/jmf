@@ -85,7 +85,7 @@ const isRouteActive = (patterns) => {
         </li>
 
          <li>
-          <NavLink :href="route('dashboard')"
+          <NavLink :href="route('contactlist.index')" :active="isRouteActive(['contactlist', 'contactlist.*'])"
             class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
             :class="isCollapsed ? 'justify-center px-2' : 'px-3'">
             <div class="flex items-center">
@@ -96,7 +96,7 @@ const isRouteActive = (patterns) => {
         </li>
 
         <li>
-          <NavLink :href="route('dashboard')"
+          <NavLink :href="route('home.admin')" :active="isRouteActive(['home.admin', 'home.admin.*'])"
             class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
             :class="isCollapsed ? 'justify-center px-2' : 'px-3'">
             <div class="flex items-center">
@@ -116,20 +116,6 @@ const isRouteActive = (patterns) => {
             </div>
           </NavLink>
         </li>
-
-        <li>
-          <NavLink :href="route('dashboard')"
-            class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
-            :class="isCollapsed ? 'justify-center px-2' : 'px-3'">
-            <div class="flex items-center">
-              <i class="fa-solid fa-code mr-2" style="font-size:20px"></i>
-              <span v-if="!isCollapsed" class="whitespace-nowrap">Footer</span>
-            </div>
-          </NavLink>
-        </li>
-        
-        
-
       </ul>
     </nav>
   </aside>
