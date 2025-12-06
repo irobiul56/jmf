@@ -39,6 +39,8 @@ Route::get('/our-activities', function () {
     ]);
 })->name('activities');
 
+ Route::get('/activities/{slug}', [HomeController::class, 'singleactivity'])->name('single.activity');
+
 Route::get('/blog', function () {
     return Inertia::render('Blog');
 })->name('blog');
@@ -59,20 +61,15 @@ Route::get('/user', function () {
     return Inertia::render('User/Profile');
 })->name('user.profile');
 
+ Route::get('/gallery', [GalleryController::class, 'gallery'])->name('gallery');
+ Route::get('/blog', [BlogController::class, 'BlogPost'])->name('blog');
 
-// Add this route for the full gallery page
-Route::get('/gallery', function () {
-    return Inertia::render('Gallery');
-})->name('gallery');
-
-
-Route::get('/blog', function () {
-    return Inertia::render('BlogPost');
-})->name('blog');
 
 Route::get('/blog/{slug}', function ($slug) {
     return Inertia::render('Blog/Show', ['slug' => $slug]);
 })->name('blog.show');
+
+ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Add these routes for CTA links
 Route::get('/donate', function () {

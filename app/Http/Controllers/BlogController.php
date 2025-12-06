@@ -24,6 +24,21 @@ class BlogController extends Controller
         ]);
     }
 
+
+public function BlogPost(Request $request)
+{
+    $perPage = 6; // Number of posts per page
+    
+    $blog = Blog::with('category')
+                ->latest()
+                ->paginate($perPage);
+    
+    return Inertia::render('BlogPost', [
+        'blog' => $blog,
+        // Let Inertia handle pagination data automatically
+    ]);
+}
+
     /**
      * Show the form for creating a new resource.
      */
@@ -70,7 +85,7 @@ class BlogController extends Controller
     public function show($slug)
     {
         $blog = Blog::where('slug', $slug)->firstOrFail();
-        return Inertia::render('Dashboard/Blog/Show', [
+        return Inertia::render('Blog/Show', [
             'blog' => $blog,
         ]);
     }

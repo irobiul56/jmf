@@ -70,7 +70,7 @@ class ActivitiesController extends Controller
     public function show($slug)
     {
         $activity = Activity::where('slug', $slug)->firstOrFail();
-        return Inertia::render('Activities/Show', [
+        return Inertia::render('Dashboard/Activities/Show', [
             'activity' => $activity,
         ]);
     }

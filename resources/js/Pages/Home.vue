@@ -1,5 +1,5 @@
 <template>
-  <AppLayout title="Jagoroni Foundation">
+  <AppLayout title="Welcome">
     <!-- Hero Section -->
     <section class="relative py-16 sm:py-24 lg:py-32 bg-gray-900 text-white overflow-hidden">
       <div class="absolute inset-0 bg-cover bg-center"  

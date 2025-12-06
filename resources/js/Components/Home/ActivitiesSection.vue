@@ -24,12 +24,12 @@
               {{ activity.category.name }}
             </div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">{{ activity.title }}</h3>
-            <p v-html="activity.description" class="text-sm text-gray-500 mb-4"></p>
+            <p v-html="getExcerpt(activity.description)" class="text-sm text-gray-500 mb-4"></p>
             <Link 
-              :href="activity.link || '#'" 
+              :href="route('single.activity', activity.slug)" 
               class="text-green-brand font-semibold hover:text-green-brand-dark transition duration-150 inline-flex items-center"
             >
-              বিস্তারিত দেখুন <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
+              See Details <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
             </Link>
           </div>
         </div>
@@ -63,6 +63,21 @@ defineProps({
 const handleImageError = (event) => {
   const activityTitle = event.target.alt || 'Activity'
   event.target.src = `https://placehold.co/600x300/10B981/FFFFFF?text=${encodeURIComponent(activityTitle)}`
+}
+
+
+const getExcerpt = (htmlContent, maxLength = 120) => {
+  if (!htmlContent) return 'No content available'
+  
+  // Remove HTML tags and get plain text
+  const tempDiv = document.createElement('div')
+  tempDiv.innerHTML = htmlContent
+  const plainText = tempDiv.textContent || tempDiv.innerText || ''
+  
+  // Truncate to max length
+  if (plainText.length <= maxLength) return plainText
+  
+  return plainText.substring(0, maxLength) + '...'
 }
 </script>
 

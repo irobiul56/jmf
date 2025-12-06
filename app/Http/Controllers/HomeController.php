@@ -75,6 +75,14 @@ public function homeadmin(){
     ]);
 }
 
+    public function singleactivity($slug)
+    {
+        $activity = Activity::where('slug', $slug)->firstOrFail();
+        return Inertia::render('Dashboard/Activities/Show', [
+            'activity' => $activity,
+        ]);
+    }
+
 
  public function update(Request $request)
 {

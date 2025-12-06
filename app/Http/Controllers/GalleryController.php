@@ -48,6 +48,64 @@ class GalleryController extends Controller
         ]);
     }
 
+    //Show to gallery Frontend
+
+    public function gallery()
+{
+    $media = Gallery::with('category')
+        ->latest()
+        ->paginate(24);
+
+    // Transform the collection
+    $transformedMedia = $media->getCollection()->transform(function ($item) {
+        return [
+            'id' => $item->id,
+            'filename' => $item->filename,
+            'original_name' => $item->original_name,
+            'path' => $item->path,
+            'caption' => $item->caption,
+            'category_id' => $item->category_id,
+            'category' => $item->category ? [
+                'id' => $item->category->id,
+                'name' => $item->category->name,
+                'slug' => $item->category->slug, // assuming you have a slug field
+            ] : null,
+            'url' => Storage::url($item->path),
+            'thumbnail_url' => Storage::url($item->path),
+            'created_at' => $item->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $item->updated_at->format('Y-m-d H:i:s'),
+            'type' => $this->getMediaType($item->filename), // helper method to determine type
+        ];
+    });
+
+    // Set the transformed collection back to paginator
+    $media->setCollection($transformedMedia);
+
+    $categories = Category::all();
+
+    return Inertia::render('Gallery', [
+        'media' => $media,
+        'categories' => $categories
+    ]);
+}
+
+// Helper method to determine media type (add this to your controller)
+private function getMediaType($filename)
+{
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    
+    $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+    $videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv'];
+    
+    if (in_array($extension, $imageExtensions)) {
+        return 'image';
+    } elseif (in_array($extension, $videoExtensions)) {
+        return 'video';
+    }
+    
+    return 'other';
+}
+
     /**
      * Store a newly created resource in storage.
      */

@@ -1,4 +1,5 @@
 <template>
+  <Head title="Activities" />
   <div class="bg-white rounded-lg shadow-lg overflow-hidden transition duration-300 ease-in-out hover:shadow-xl">
     <div class="aspect-w-16 aspect-h-9">
       <img 
@@ -19,17 +20,19 @@
         
       </p>
 
-      <a 
-        href="#" 
+      <Link 
+        :href="route('single.activity', activity.slug)" 
         class="inline-flex items-center justify-center w-full px-4 py-2 border border-green-600 text-base font-medium rounded-md text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
       >
         See Details
-      </a>
+      </Link>
     </div>
   </div>
 </template>
 
 <script setup>
+import { Head, Link } from '@inertiajs/vue3';
+
 defineProps({
   activity: {
     type: Object,

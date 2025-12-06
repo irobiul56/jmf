@@ -49,6 +49,15 @@
           <div class="w-full lg:w-1/4 bg-white p-2 rounded-lg shadow-xl h-fit">
             <ul class="space-y-2">
               <li 
+                class="p-3 rounded-md text-sm font-medium cursor-pointer transition duration-150"
+                :class="activeCategory === null 
+                  ? 'text-green-700 bg-green-50/70 border-l-4 border-green-500 font-semibold' 
+                  : 'text-gray-700 hover:bg-gray-100'"
+                @click="setActiveCategory(null)"
+              >
+                All Categories
+              </li>
+              <li 
                 v-for="category in categories" 
                 :key="category.id"
                 class="p-3 rounded-md text-sm font-medium cursor-pointer transition duration-150"
@@ -65,37 +74,112 @@
           <!-- Gallery Grid -->
           <div class="w-full lg:w-3/4">
             <!-- Picture Gallery -->
-            <div v-if="activeTab === 'picture'" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div v-if="activeTab === 'picture'" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               <div 
-                v-for="(image, index) in filteredImages" 
+                v-for="(item, index) in filteredMedia" 
                 :key="index"
                 class="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300 cursor-pointer"
-                @click="openLightbox(image)"
+                @click="item.type === 'image' ? openLightbox(item) : null"
               >
-                <div class="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
-                  <img 
-                    :src="image.src" 
-                    :alt="image.alt"
-                    class="w-full h-full object-cover"
-                  >
+                <div class="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden relative">
+                  <!-- Image -->
+                  <div v-if="item.type === 'image'" class="w-full h-full">
+                    <img 
+                      :src="item.url" 
+                      :alt="item.caption || item.original_name"
+                      class="w-full h-full object-cover"
+                      @error="handleImageError"
+                    />
+                    <div 
+                      v-if="item.caption" 
+                      class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3"
+                    >
+                      <p class="text-white text-sm line-clamp-2">{{ item.caption }}</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Video Placeholder -->
+                  <div v-else class="text-center">
+                    <div class="text-gray-600 mb-2">
+                      <i class="fas fa-video text-3xl"></i>
+                    </div>
+                    <p class="text-sm text-gray-700 font-medium">{{ item.original_name }}</p>
+                  </div>
+                </div>
+                
+                <!-- Info Section -->
+                <div class="p-3">
+                  <p class="text-xs text-gray-500 mb-1">
+                    Added: {{ formatDate(item.created_at) }}
+                  </p>
+                  <div v-if="item.category" class="flex items-center justify-between">
+                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                      {{ item.category.name }}
+                    </span>
+                    <button 
+                      v-if="item.type === 'image'"
+                      @click.stop="openLightbox(item)"
+                      class="text-green-600 hover:text-green-800 text-sm"
+                    >
+                      <i class="fas fa-expand"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- Video Gallery -->
-            <div v-if="activeTab === 'video'" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div v-if="activeTab === 'video'" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               <div 
-                v-for="(video, index) in filteredVideos" 
-                :key="index"
-                class="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300 cursor-pointer"
+                v-for="item in filteredMedia" 
+                :key="item.id"
+                class="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300"
               >
                 <div class="w-full h-48 bg-gray-800 flex items-center justify-center relative">
                   <div class="text-white text-center">
-                    <i class="fas fa-play text-4xl mb-2 opacity-80"></i>
-                    <p class="text-sm">{{ video.title }}</p>
+                    <i class="fas fa-play-circle text-5xl mb-3 opacity-80"></i>
+                    <p class="text-sm font-medium">{{ item.original_name }}</p>
+                  </div>
+                </div>
+                <div class="p-3">
+                  <div v-if="item.category" class="flex justify-between items-center">
+                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                      {{ item.category.name }}
+                    </span>
+                    <button class="text-blue-600 hover:text-blue-800 text-sm">
+                      <i class="fas fa-download"></i>
+                    </button>
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Pagination -->
+            <div v-if="media.data && media.data.length > 0" class="mt-8 flex justify-center">
+              <nav class="flex items-center space-x-2">
+                <button
+                  v-for="(link, index) in media.links"
+                  :key="index"
+                  @click="link.url ? $inertia.get(link.url) : null"
+                  class="px-3 py-1 rounded-md text-sm"
+                  :class="{
+                    'bg-green-500 text-white': link.active,
+                    'bg-white text-gray-700 hover:bg-gray-100': !link.active && link.url,
+                    'text-gray-400 cursor-not-allowed': !link.url
+                  }"
+                  v-html="link.label"
+                  :disabled="!link.url"
+                ></button>
+              </nav>
+            </div>
+
+            <!-- No Results -->
+            <div v-if="filteredMedia.length === 0" class="text-center py-12">
+              <div class="text-gray-400 text-6xl mb-4">
+                <i class="fas fa-image"></i>
+              </div>
+              <p class="text-gray-600 text-lg">No media found for this category</p>
+              <p class="text-gray-500 text-sm mt-2">Try selecting a different category</p>
             </div>
           </div>
         </div>
@@ -105,82 +189,101 @@
     <!-- Lightbox Modal -->
     <div 
       v-if="showLightbox" 
-      class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+      class="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4"
       @click="closeLightbox"
     >
-      <div class="relative max-w-4xl max-h-full">
+      <div class="relative max-w-5xl max-h-[90vh] w-full" @click.stop>
         <button 
-          class="absolute -top-12 right-0 text-white text-2xl hover:text-gray-300 transition duration-150"
+          class="absolute -top-12 right-0 text-white text-3xl hover:text-gray-300 transition duration-150 z-10"
           @click="closeLightbox"
         >
           <i class="fas fa-times"></i>
         </button>
-        <img 
-          :src="currentImage.src" 
-          :alt="currentImage.alt"
-          class="max-w-full max-h-full object-contain"
+        
+        <div class="bg-white rounded-lg overflow-hidden">
+          <img 
+            :src="currentMedia.url" 
+            :alt="currentMedia.caption || currentMedia.original_name"
+            class="w-full max-h-[70vh] object-contain"
+          />
+          <div v-if="currentMedia.caption" class="p-4 bg-white">
+            <p class="text-gray-800">{{ currentMedia.caption }}</p>
+            <div class="flex justify-between items-center mt-2">
+              <span class="text-sm text-gray-500">
+                {{ currentMedia.original_name }}
+              </span>
+              <span v-if="currentMedia.category" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                {{ currentMedia.category.name }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Navigation Arrows -->
+        <button 
+          v-if="currentMediaIndex > 0"
+          @click="prevImage"
+          class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300"
         >
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        <button 
+          v-if="currentMediaIndex < filteredMedia.length - 1"
+          @click="nextImage"
+          class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </div>
   </div>
-  </AppLayout>
+</AppLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+
+// Get props from Inertia
+const props = defineProps({
+  media: Object,
+  categories: Array
+})
 
 // Reactive data
 const activeTab = ref('picture')
-const activeCategory = ref('all')
+const activeCategory = ref(null)
 const showLightbox = ref(false)
-const currentImage = ref({ src: '', alt: '' })
-const lastScrollY = ref(0)
-const scrollThreshold = 100
-
-// Hero image
+const currentMedia = ref({})
+const currentMediaIndex = ref(0)
 const heroImage = ref('1.jpeg')
 
-// Categories data
-const categories = ref([
-  { id: 'all', name: 'All' },
-  { id: 'flood', name: 'Flood' },
-  { id: 'food-distribution', name: 'Food Distribution' },
-  { id: 'self-reliance', name: 'Self Reliance' },
-  { id: 'qurbani', name: 'Qurbani' },
-  { id: 'winter-relief', name: 'Winter Relief' }
-])
-
-// Images data
-const images = ref([
-  { id: 1, src: 'storage/images/1.jpeg', alt: 'Gallery Image 1', category: 'all' },
-  { id: 2, src: 'storage/images/3.jpeg', alt: 'Gallery Image 2', category: 'all' },
-  { id: 3, src: 'storage/images/4.jpeg', alt: 'Gallery Image 3', category: 'all' },
-  { id: 4, src: 'storage/images/5.jpeg', alt: 'Gallery Image 4', category: 'all' },
-  { id: 5, src: 'storage/images/6.jpeg', alt: 'Gallery Image 5', category: 'all' },
-  { id: 6, src: 'storage/images/7.jpeg', alt: 'Gallery Image 6', category: 'all' }
-])
-
-// Videos data (placeholder)
-const videos = ref([
-  { id: 1, title: 'Foundation Activities', category: 'all' },
-  { id: 2, title: 'Relief Work', category: 'flood' },
-  { id: 3, title: 'Skill Development', category: 'self-reliance' }
-])
-
 // Computed properties
-const filteredImages = computed(() => {
-  if (activeCategory.value === 'all') {
-    return images.value
+const filteredMedia = computed(() => {
+  if (!props.media || !props.media.data) return []
+  
+  const mediaData = props.media.data
+  
+  // Filter by tab (picture/video)
+  let filtered = mediaData.filter(item => {
+    if (activeTab.value === 'picture') {
+      return item.type === 'image'
+    } else if (activeTab.value === 'video') {
+      return item.type === 'video'
+    }
+    return true
+  })
+  
+  // Filter by category
+  if (activeCategory.value !== null) {
+    filtered = filtered.filter(item => 
+      item.category && item.category.id === activeCategory.value
+    )
   }
-  return images.value.filter(image => image.category === activeCategory.value)
-})
-
-const filteredVideos = computed(() => {
-  if (activeCategory.value === 'all') {
-    return videos.value
-  }
-  return videos.value.filter(video => video.category === activeCategory.value)
+  
+  return filtered
 })
 
 // Methods
@@ -192,60 +295,83 @@ const setActiveCategory = (categoryId) => {
   activeCategory.value = categoryId
 }
 
-const openLightbox = (image) => {
-  currentImage.value = image
+const openLightbox = (media) => {
+  if (media.type !== 'image') return
+  
+  currentMedia.value = media
+  currentMediaIndex.value = filteredMedia.value.findIndex(item => item.id === media.id)
   showLightbox.value = true
 }
 
 const closeLightbox = () => {
   showLightbox.value = false
-  currentImage.value = { src: '', alt: '' }
+  currentMedia.value = {}
+  currentMediaIndex.value = 0
 }
 
-// Scroll handling for header (if needed elsewhere)
-const handleScroll = () => {
-  const currentScrollY = window.scrollY
-  const header = document.querySelector('.sticky-header')
-  
-  if (!header) return
-  
-  if (currentScrollY > lastScrollY.value && currentScrollY > scrollThreshold) {
-    header.classList.add('header-slide-up')
-  } else if (currentScrollY < lastScrollY.value) {
-    header.classList.remove('header-slide-up')
+const nextImage = () => {
+  if (currentMediaIndex.value < filteredMedia.value.length - 1) {
+    currentMediaIndex.value++
+    currentMedia.value = filteredMedia.value[currentMediaIndex.value]
   }
-  
-  lastScrollY.value = currentScrollY
 }
 
-// Handle window resize
-const handleResize = () => {
-  // Add resize logic if needed
+const prevImage = () => {
+  if (currentMediaIndex.value > 0) {
+    currentMediaIndex.value--
+    currentMedia.value = filteredMedia.value[currentMediaIndex.value]
+  }
+}
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
+const handleImageError = (event) => {
+  // Set fallback image
+  event.target.src = '/storage/images/placeholder.jpg'
 }
 
 // Keyboard events for lightbox
 const handleKeydown = (event) => {
-  if (event.key === 'Escape' && showLightbox.value) {
-    closeLightbox()
+  if (!showLightbox.value) return
+  
+  switch(event.key) {
+    case 'Escape':
+      closeLightbox()
+      break
+    case 'ArrowRight':
+      nextImage()
+      break
+    case 'ArrowLeft':
+      prevImage()
+      break
   }
 }
 
 // Lifecycle hooks
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
-  window.addEventListener('resize', handleResize)
   window.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('resize', handleResize)
   window.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
 <style scoped>
-/* Custom styles for the gallery component */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -253,13 +379,27 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-/* Ensure smooth transitions */
 .transform {
   transition: transform 0.3s ease;
 }
 
-/* Custom scroll behavior */
-html {
-  scroll-behavior: smooth;
+/* Lightbox animation */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Image hover effects */
+img {
+  transition: transform 0.3s ease;
+}
+
+.bg-gradient-to-t {
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
 }
 </style>

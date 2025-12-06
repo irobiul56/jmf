@@ -5,17 +5,17 @@ import Applayout from '@/Layouts/AppLayout.vue';
 import { ArrowRight } from '@element-plus/icons-vue'
 
 const props = defineProps({
-    activity: Object,
+    blog: Object,
 });
 </script>
 
 <template>
-    <Head title="Activities" />
+    <Head title="Blog" />
     <Applayout>
         <div class="relative w-full h-96">
             <!-- Background image with proper object-cover and fallback -->
-            <img :src="`/storage/${activity.image}`"
-                alt="{{ activity.title }}"
+            <img :src="`/storage/${blog.image}`"
+                alt="{{ blog.title }}"
                 class="absolute inset-0 w-full h-full object-cover"
                 onerror="this.style.display='none'"
             >
@@ -24,15 +24,15 @@ const props = defineProps({
             <!-- Content -->
             <div class="absolute inset-0 flex items-center justify-center">
                 <div class="bg-green-600 text-white px-6 py-4 rounded-lg shadow-xl max-w-3xl mx-4 bg-opacity-30">
-                    <h1 class="text-3xl md:text-4xl font-bold text-center">{{ activity.title }}</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold text-center">{{ blog.title }}</h1>
                 </div>
             </div>
         </div>
 
         <div class="p-6 mx-auto max-w-5xl">
             <!-- Content wrapper with proper styling -->
-            <div class="activity-content prose prose-lg max-w-none" v-html="activity.description"></div>
-            <el-button class="mt-8" type="primary" @click="$inertia.get('/our-activities')">Back</el-button>
+            <div class="blog-content prose prose-lg max-w-none" v-html="blog.description"></div>
+            <el-button class="mt-8" type="primary" @click="$inertia.get('/blog')">Back</el-button>
         </div>
     </Applayout>
 </template>
@@ -59,57 +59,57 @@ const props = defineProps({
 
 <style>
 /* Global styles for CKEditor content */
-.activity-content {
+.blog-content {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
     color: #333;
 }
 
 /* Headings */
-.activity-content h1,
-.activity-content h2,
-.activity-content h3,
-.activity-content h4 {
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4 {
     margin-top: 1.5em;
     margin-bottom: 0.5em;
     font-weight: 600;
     line-height: 1.3;
 }
 
-.activity-content h1 { font-size: 2.25rem; }
-.activity-content h2 { font-size: 1.875rem; }
-.activity-content h3 { font-size: 1.5rem; }
-.activity-content h4 { font-size: 1.25rem; }
+.blog-content h1 { font-size: 2.25rem; }
+.blog-content h2 { font-size: 1.875rem; }
+.blog-content h3 { font-size: 1.5rem; }
+.blog-content h4 { font-size: 1.25rem; }
 
 /* Paragraphs and text */
-.activity-content p {
+.blog-content p {
     margin-bottom: 1.25rem;
     font-size: 1.125rem;
 }
 
 /* Lists */
-.activity-content ul,
-.activity-content ol {
+.blog-content ul,
+.blog-content ol {
     margin-bottom: 1.25rem;
     padding-left: 1.5rem;
 }
 
-.activity-content li {
+.blog-content li {
     margin-bottom: 0.5rem;
 }
 
 /* Links */
-.activity-content a {
+.blog-content a {
     color: #3b82f6;
     text-decoration: none;
 }
 
-.activity-content a:hover {
+.blog-content a:hover {
     text-decoration: underline;
 }
 
 /* Blockquotes */
-.activity-content blockquote {
+.blog-content blockquote {
     border-left: 4px solid #e5e7eb;
     padding-left: 1rem;
     font-style: italic;
@@ -118,7 +118,7 @@ const props = defineProps({
 }
 
 /* Images */
-.activity-content img {
+.blog-content img {
     max-width: 100%;
     height: auto;
     border-radius: 0.375rem;
@@ -126,26 +126,26 @@ const props = defineProps({
 }
 
 /* Tables */
-.activity-content table {
+.blog-content table {
     width: 100%;
     border-collapse: collapse;
     margin: 1.5rem 0;
 }
 
-.activity-content table th,
-.activity-content table td {
+.blog-content table th,
+.blog-content table td {
     border: 1px solid #e5e7eb;
     padding: 0.75rem;
     text-align: left;
 }
 
-.activity-content table th {
+.blog-content table th {
     background-color: #f9fafb;
     font-weight: 600;
 }
 
 /* Code blocks */
-.activity-content pre {
+.blog-content pre {
     background-color: #f3f4f6;
     border-radius: 0.375rem;
     padding: 1rem;
@@ -153,13 +153,13 @@ const props = defineProps({
     margin: 1.5rem 0;
 }
 
-.activity-content code {
+.blog-content code {
     font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
     font-size: 0.875rem;
 }
 
 /* Horizontal rule */
-.activity-content hr {
+.blog-content hr {
     border: 0;
     border-top: 1px solid #e5e7eb;
     margin: 2rem 0;
@@ -167,13 +167,13 @@ const props = defineProps({
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .activity-content {
+    .blog-content {
         font-size: 1rem;
     }
     
-    .activity-content h1 { font-size: 1.875rem; }
-    .activity-content h2 { font-size: 1.5rem; }
-    .activity-content h3 { font-size: 1.25rem; }
-    .activity-content h4 { font-size: 1.125rem; }
+    .blog-content h1 { font-size: 1.875rem; }
+    .blog-content h2 { font-size: 1.5rem; }
+    .blog-content h3 { font-size: 1.25rem; }
+    .blog-content h4 { font-size: 1.125rem; }
 }
 </style>

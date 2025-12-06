@@ -40,15 +40,17 @@
         </div>
 
         <!-- Blog Posts -->
-        <div class="space-y-10">
+        <div class="space-y-10" v-if="blog.data && blog.data.length > 0">
 
-          <!-- Featured Post -->
-          <a href="#" class="block bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 overflow-hidden group border border-gray-100">
+          <!-- Featured Post (First blog post as featured) -->
+          <Link :href="`/blog/${featuredPost.slug}`" 
+             class="block bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 overflow-hidden group border border-gray-100"
+             v-if="featuredPost">
             <div class="grid grid-cols-1 lg:grid-cols-3">
               <div class="lg:col-span-2">
                 <img 
-                  src="storage/images/1.jpeg" 
-                  alt="Month-long Da'wah Training Completed"
+                  :src="getImageUrl(featuredPost.image)" 
+                  :alt="featuredPost.title"
                   class="w-full h-72 object-cover transition duration-500 group-hover:scale-[1.03]"
                   @error="handleImageError"
                 >
@@ -56,34 +58,39 @@
               <div class="lg:col-span-1 p-6 flex flex-col justify-between">
                 <div>
                   <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-brand transition duration-150">
-                    Month-long Da'wah Training-2025 Completed
+                    {{ featuredPost.title }}
                   </h3>
                   <p class="text-gray-600 text-sm mb-4 line-clamp-3">
-                    The Da'wah Training 2025, organized by the Jagoroni Da'wah and Research Institute, has successfully come to an end. The most comprehensive training program focused on real-world applications of Islamic principles...
+                    {{ getExcerpt(featuredPost.description, 150) }}
                   </p>
                 </div>
-                <p class="text-xs text-gray-400 font-medium">
-                  October 19, 2025
-                </p>
+                <div class="flex items-center justify-between">
+                  <p class="text-xs text-gray-400 font-medium">
+                    {{ formatDate(featuredPost.created_at) }}
+                  </p>
+                  <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                    {{ featuredPost.category?.name || 'Uncategorized' }}
+                  </span>
+                </div>
               </div>
             </div>
-          </a>
+          </Link>
           
-          <hr class="border-gray-200">
+          <hr class="border-gray-200" v-if="featuredPost">
 
           <!-- Blog Posts Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             
-            <!-- Blog Post 1 -->
-            <a 
-              href="#" 
+            <!-- Blog Post Items -->
+            <Link 
+              :href="`/blog/${post.slug}`" 
               class="block bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 overflow-hidden group border border-gray-100"
-              v-for="post in filteredPosts"
+              v-for="post in filteredBlogPosts"
               :key="post.id"
             >
               <div class="h-48">
                 <img 
-                  :src="post.image" 
+                  :src="getImageUrl(post.image)" 
                   :alt="post.title"
                   class="w-full h-full object-cover transition duration-500 group-hover:scale-105"
                   @error="handleImageError"
@@ -94,24 +101,36 @@
                   {{ post.title }}
                 </h4>
                 <p class="text-gray-600 text-sm mb-3 line-clamp-3">
-                  {{ post.excerpt }}
+                  {{ getExcerpt(post.description, 100) }}
                 </p>
-                <p class="text-xs text-gray-400 font-medium pt-2 border-t border-gray-100">
-                  {{ post.date }}
-                </p>
+                <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                  <p class="text-xs text-gray-400 font-medium">
+                    {{ formatDate(post.created_at) }}
+                  </p>
+                  <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
+                    {{ post.category?.name || 'Uncategorized' }}
+                  </span>
+                </div>
               </div>
-            </a>
+            </Link>
             
           </div>
         </div>
+
+        <!-- No posts message -->
+        <div v-else class="text-center py-12">
+          <p class="text-gray-500 text-lg">No blog posts available.</p>
+        </div>
         
         <!-- Load More Button -->
-        <div class="mt-12 text-center">
+        <div class="mt-12 text-center" v-if="blog.data && blog.data.length > 0 && blog.links?.next">
           <button 
             @click="loadMorePosts"
-            class="px-6 py-3 border border-green-brand text-sm font-semibold rounded-lg text-green-brand hover:bg-green-brand hover:text-black transition duration-300"
+            :disabled="loading"
+            class="px-6 py-3 border border-green-brand text-sm font-semibold rounded-lg text-green-brand hover:bg-green-brand hover:text-black transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Load More Posts
+            <span v-if="loading">Loading...</span>
+            <span v-else>Load More Posts</span>
           </button>
         </div>
 
@@ -123,43 +142,41 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { router, Link } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+
+// Define props from Inertia
+const props = defineProps({
+  blog: {
+    type: Object,
+    default: () => ({ data: [] })
+  }
+})
 
 // Reactive data
 const searchQuery = ref('')
 const language = ref('en')
-const posts = ref([
-  {
-    id: 1,
-    title: 'Jagoroni Foundation Stands with 300 Martyred...',
-    excerpt: 'Jagoroni Foundation has provided financial assistance of 100,000 BDT to each of the families of 300 martyrs from the Ansars...',
-    date: 'October 19, 2025',
-    image: 'storage/images/3.jpeg'
-  },
-  {
-    id: 2,
-    title: 'Prize Distribution for the 2nd and 3rd Phases of the Qura...',
-    excerpt: 'The prize distribution ceremony for the second and third phases of the Quran recitation competition was held in the joyful and inspiring atmosphere of the Foundation...',
-    date: 'October 19, 2025',
-    image: 'storage/images/4.jpeg'
-  },
-  {
-    id: 3,
-    title: 'Jagoroni Foundation\'s Roundtable Meeting on...',
-    excerpt: 'To reduce the severity and damage caused by floods and to formulate sustainable rehabilitation strategies, Jagoroni Foundation organized a critical roundtable discussion...',
-    date: 'October 19, 2025',
-    image: 'storage/images/5.jpeg'
-  }
-])
+const loading = ref(false)
 
 // Computed properties
-const filteredPosts = computed(() => {
-  if (!searchQuery.value) return posts.value
+const featuredPost = computed(() => {
+  return props.blog.data.length > 0 ? props.blog.data[0] : null
+})
+
+const filteredBlogPosts = computed(() => {
+  let posts = props.blog.data
+  
+  // Skip the first post (featured) from grid if it exists
+  if (featuredPost.value) {
+    posts = posts.slice(1)
+  }
+  
+  if (!searchQuery.value) return posts
   
   const query = searchQuery.value.toLowerCase()
-  return posts.value.filter(post => 
-    post.title.toLowerCase().includes(query) || 
-    post.excerpt.toLowerCase().includes(query)
+  return posts.filter(post => 
+    post.title?.toLowerCase().includes(query) || 
+    post.description?.toLowerCase().includes(query)
   )
 })
 
@@ -169,35 +186,102 @@ const toggleLanguage = () => {
 }
 
 const handleImageError = (event) => {
-  event.target.src = 'https://placehold.co/400x200/96d482/ffffff?text=Post+Image'
+  console.error('Image failed to load:', event.target.src)
+  event.target.src = 'https://placehold.co/400x200/96d482/ffffff?text=Blog+Image'
 }
 
-const loadMorePosts = () => {
-  // In a real application, this would fetch more posts from an API
-  console.log('Loading more posts...')
-  // Example of adding more posts
-  const newPost = {
-    id: posts.value.length + 1,
-    title: 'New Blog Post ' + (posts.value.length + 1),
-    excerpt: 'This is a new blog post added when clicking load more...',
-    date: 'October 20, 2025',
-    image: 'https://placehold.co/400x200/96d482/ffffff?text=New+Post'
+const loadMorePosts = async () => {
+  if (props.blog.links?.next && !loading.value) {
+    loading.value = true
+    try {
+      await router.get(props.blog.links.next, {}, {
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: () => {
+          loading.value = false
+        },
+        onError: () => {
+          loading.value = false
+        }
+      })
+    } catch (error) {
+      loading.value = false
+      console.error('Error loading more posts:', error)
+    }
   }
-  posts.value.push(newPost)
+}
+
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return 'https://placehold.co/400x200/96d482/ffffff?text=Blog+Image'
+  
+  // Check if it's already a full URL
+  if (imagePath.startsWith('http')) {
+    return imagePath
+  }
+  
+  // Debug: Log the image path
+  console.log('Image path:', imagePath)
+  
+  // For Laravel storage paths
+  // If image is stored in storage/app/public
+  // Remove 'public/' if it exists
+  let cleanPath = imagePath.replace('public/', '')
+  
+  // If it starts with 'storage/', remove it (we'll add it back correctly)
+  cleanPath = cleanPath.replace(/^storage\//, '')
+  
+  // Return the correct URL for storage
+  return `/storage/${cleanPath}`
+}
+
+const getExcerpt = (description, length) => {
+  if (!description) return ''
+  
+  // Strip HTML tags if any
+  const plainText = description.replace(/<[^>]*>/g, '')
+  
+  if (plainText.length <= length) return plainText
+  
+  return plainText.substring(0, length) + '...'
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  } catch (error) {
+    console.error('Error formatting date:', error)
+    return dateString
+  }
 }
 
 // Lifecycle hooks
 onMounted(() => {
   console.log('Blog page component mounted')
+  console.log('Blog data:', props.blog)
+  
+  // Check if images are loading
+  if (props.blog.data && props.blog.data.length > 0) {
+    props.blog.data.forEach((post, index) => {
+      console.log(`Post ${index} image path:`, post.image)
+      console.log(`Post ${index} image URL:`, getImageUrl(post.image))
+    })
+  }
 })
 </script>
 
 <style scoped>
 /* Custom brand colors */
 .text-green-brand { color: #10B981; } 
-.bg-green-brand { background-color: #10B981; }
-.hover\:bg-green-brand-dark:hover { background-color: #059669; }
-.border-green-brand { border-color: #10B981; }
+.bg-green-brand { background-color: #10B481; }
+.hover\:bg-green-brand:hover { background-color: #059669; }
+.border-green-brand { border-color: #10B481; }
 
 /* Line clamp utility */
 .line-clamp-2 {
